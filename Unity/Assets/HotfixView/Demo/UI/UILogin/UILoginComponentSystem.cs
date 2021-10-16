@@ -1,6 +1,6 @@
-﻿using System;
+﻿using AssetBundles;
+using System;
 using System.Net;
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +15,11 @@ namespace ET
 			self.loginBtn.GetComponent<Button>().onClick.AddListener(self.OnLogin);
 			self.account = rc.Get<GameObject>("Account");
 			self.password = rc.Get<GameObject>("Password");
-		}
+			self.icon = rc.Get<GameObject>("Icon").GetComponent<Image>();
+			//var sprites = Resources.LoadAll<Sprite>("cards/cards");
+			var sprite = ResourceManager.LoadAssetAtPath<Sprite>("Res/images/1024/bg_attack_purple.png");
+			self.icon.sprite = sprite;
+        }
 	}
 	
 	public static class UILoginComponentSystem

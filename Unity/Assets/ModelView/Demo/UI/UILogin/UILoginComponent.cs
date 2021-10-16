@@ -11,5 +11,6 @@ namespace ET
 		public GameObject account;
 		public GameObject password;
 		public GameObject loginBtn;
+		public Image icon;
 	}
 }

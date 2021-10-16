@@ -1,0 +1,142 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: cardui
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 4096
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 24c1ebe73f5ef724b8c37745e040c5f9, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 61d0dbe0cb313ad44a16361e981a87f2, type: 3}
+  - {fileID: 21300000, guid: df74a76149ac3004ca50417f6edc6ecb, type: 3}
+  - {fileID: 21300000, guid: 6b1810a2cf3e0034e9d0377aa25ea9a7, type: 3}
+  - {fileID: 21300000, guid: 9d1f97d203a9ed243898b3f50b964099, type: 3}
+  - {fileID: 21300000, guid: 482eca3320408a34482d6c8daaead029, type: 3}
+  - {fileID: 21300000, guid: 508f1e63bbb6ad349aa7930cd72e0da9, type: 3}
+  - {fileID: 21300000, guid: f2f66ae3f0aef2545b23b2caf0e4f74a, type: 3}
+  - {fileID: 21300000, guid: 8099d024d711b5845b7150f84bbdecf9, type: 3}
+  - {fileID: 21300000, guid: aa755a445ca97804b88ae861618f98a1, type: 3}
+  - {fileID: 21300000, guid: a6ec06744c9e45b488f14dfc5e17a75c, type: 3}
+  - {fileID: 21300000, guid: cf1e9584668b6654890607dbdd88dd99, type: 3}
+  - {fileID: 21300000, guid: de1a468498284e44f954ed0a690cd023, type: 3}
+  - {fileID: 21300000, guid: c4a0d8c499317304894bf816521eb967, type: 3}
+  - {fileID: 21300000, guid: 61cb8c950fda11f4688c51d959d895d0, type: 3}
+  - {fileID: 21300000, guid: 4e03e1b50fb391b45a2ef9fcf88354b4, type: 3}
+  - {fileID: 21300000, guid: 45bd42063d730d9498c189b4e0d7a023, type: 3}
+  - {fileID: 21300000, guid: 3ff8f706b405a7a44b5121546a5c1465, type: 3}
+  - {fileID: 21300000, guid: 274f31869627dc44d94a4b3c2faf68f4, type: 3}
+  - {fileID: 21300000, guid: f3c59dc6ba5d56b4185de53e1642c9cf, type: 3}
+  - {fileID: 21300000, guid: 8aad4a07aa32b1f4cae835b8e4d27781, type: 3}
+  - {fileID: 21300000, guid: 47121f3756d2a73459c210f2a94f8fde, type: 3}
+  - {fileID: 21300000, guid: aac0af7715d122e48a0c69d6f0e2e847, type: 3}
+  - {fileID: 21300000, guid: ff117e0818ef573449d88851a7a315fc, type: 3}
+  - {fileID: 21300000, guid: e6154ec80a04a7e4ca26efde01fb548d, type: 3}
+  - {fileID: 21300000, guid: cca6c209e296a934288af5acdfa57274, type: 3}
+  - {fileID: 21300000, guid: e014ec0a5df75034d8b1bf2b2af05dd9, type: 3}
+  - {fileID: 21300000, guid: 1366133a3222d014a82bcbd0afe1fa75, type: 3}
+  - {fileID: 21300000, guid: 7405fe4a9e5ad944ea789cd75e125ab1, type: 3}
+  - {fileID: 21300000, guid: 8516665a4c2bd1843b0a6b297a3f2fcb, type: 3}
+  - {fileID: 21300000, guid: 713c58ea0ec693f4d98aaa8cc7700ad6, type: 3}
+  - {fileID: 21300000, guid: 36be810b5334ecf4284bae4ae156a123, type: 3}
+  - {fileID: 21300000, guid: 132c005ba3c7bfd4e826940d239b7dcd, type: 3}
+  - {fileID: 21300000, guid: dadce37b1474a224396a0653bed4d4d2, type: 3}
+  - {fileID: 21300000, guid: b3d37abb0a1ce6247886c455bbe5a9c6, type: 3}
+  - {fileID: 21300000, guid: c9a6b0ac7b525a543be9b47c58286dd6, type: 3}
+  - {fileID: 21300000, guid: cfc460dcab57a844a958dd1695cdb522, type: 3}
+  - {fileID: 21300000, guid: e0d1554dd7342dd4aae94204d7d8ff30, type: 3}
+  - {fileID: 21300000, guid: a4536fbdd2173ef4390eb1f26a5cd5c7, type: 3}
+  - {fileID: 21300000, guid: d3c4da0e9df60e94db5fad75b4433525, type: 3}
+  - {fileID: 21300000, guid: b6b1d71ebbfa4a44bb7b065c7052833b, type: 3}
+  - {fileID: 21300000, guid: 7727bf9ee6f568e4a9725ed513ed01e8, type: 3}
+  - {fileID: 21300000, guid: 04cfa6ae1c2633d40a6ffd8bf2ac644a, type: 3}
+  - {fileID: 21300000, guid: 08b9a38fb88e42049a49e5b5686f61a8, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - bg_skill_red
+  - bg_skill_black
+  - bg_attack_red
+  - card_blue_orb
+  - bg_attack_blue
+  - rare_left
+  - common_right
+  - bg_power_purple
+  - bg_attack_purple
+  - card_purple_orb
+  - frame_skill_uncommon
+  - banner_uncommon
+  - bg_attack_colorless
+  - card_green_orb
+  - frame_power_uncommon
+  - bg_skill_purple
+  - bg_power_red
+  - bg_power_blue
+  - bg_power_green
+  - bg_skill_blue
+  - frame_attack_common
+  - rare_right
+  - frame_attack_rare
+  - bg_attack_green
+  - bg_skill_colorless
+  - frame_power_rare
+  - card_red_orb
+  - card_colorless_orb
+  - rare_center
+  - frame_skill_common
+  - common_left
+  - common_center
+  - bg_power_gray
+  - uncommon_left
+  - bg_power_colorless
+  - frame_power_common
+  - banner_rare
+  - uncommon_right
+  - frame_skill_rare
+  - bg_skill_green
+  - frame_attack_uncommon
+  - banner_common
+  - uncommon_center
+  m_RenderDataMap: {}
+  m_Tag: cardui
+  m_IsVariant: 0
