@@ -21,5 +21,8 @@ MonoBehaviour:
     path: Res\images\1024Portraits
     searchPattern: '*.png'
     searchOption: 1
-  targetDir: ABTemp
+  - type: 2
+    path: Res\Perfab
+    searchPattern: '*.prefab'
+    searchOption: 1
   targetPlatform: 19

@@ -44,21 +44,29 @@ public class PackageConfig : ScriptableObject
     [SerializeField]
     List<PackageItem> packageItems;
     [SerializeField]
-    [FolderPath(AbsolutePath=false)]
-    string targetDir;
-    [SerializeField]
     BuildTarget targetPlatform;
     #endregion
 
 
-    string abExtens = AssetBundles.AssetBundleConfig.AssetBundleSuffix;
-    string abDirExtens = AssetBundles.AssetBundleConfig.AssetBundleSuffix;
-
-
+    string abExtens = AssetBundleConfig.AssetBundleSuffix;
+    string abDirExtens = AssetBundleConfig.AssetBundleSuffix;
+    string _targetDir;
+    public string TargetDir
+    {
+        get
+        {
+            if(string.IsNullOrEmpty(_targetDir))
+            {
+                _targetDir = $"../Release/{targetPlatform}/StreamingAssets";
+            }
+            return _targetDir;
+        }
+    }
     //文件打包
     public bool PackFile(string res)
     {
-        AssetImporter importer = AssetImporter.GetAtPath(res);
+        string path = "Assets/" + res;
+        AssetImporter importer = AssetImporter.GetAtPath(path);
         if (importer == null)
         {
             Debug.LogError("Path not Exist!" + res);
@@ -71,7 +79,8 @@ public class PackageConfig : ScriptableObject
     //打包目录中所有资源，查找文件夹下的所有文件，每个文件单独一个AB包
     public bool PackDirFiles(string res, string pattern, SearchOption searchOption)
     {
-        string[] files = Directory.GetFiles(res, pattern, searchOption);
+        string path = "Assets/" + res;
+        string[] files = Directory.GetFiles(path, pattern, searchOption);
         if (files.Length == 0) return false;
         foreach (var file in files)
         {
@@ -83,7 +92,8 @@ public class PackageConfig : ScriptableObject
     //目录打包
     public bool PackDir(string res, string pattern, SearchOption searchOption)
     {
-        string[] files = Directory.GetFiles(res, pattern, searchOption);
+        string path = "Assets/" + res;
+        string[] files = Directory.GetFiles(path, pattern, searchOption);
         if (files.Length == 0) return false;
         string fn = res.Trim('/') + abDirExtens;
 
@@ -98,7 +108,8 @@ public class PackageConfig : ScriptableObject
     //打包目录中所有资源
     public bool PackDirDir(string res, string pattern)
     {
-        string[] Dirs = Directory.GetDirectories(res);
+        string path = "Assets/" + res;
+        string[] Dirs = Directory.GetDirectories(path);
         if (Dirs.Length == 0) return false;
         foreach (var d in Dirs)
         {
@@ -108,20 +119,21 @@ public class PackageConfig : ScriptableObject
     }
     public static void CreateAssetbundleForCurrent(string assetPath)
     {
-        AssetImporter importer = AssetImporter.GetAtPath(assetPath);
+        string outputFilePath = AssetBundleConfig.GetAssetPath(assetPath);
+        AssetImporter importer = AssetImporter.GetAtPath(outputFilePath);
         if (importer == null)
         {
             Debug.LogError(string.Format("importer null! make sure object at path({0}) is a valid assetbundle!", assetPath));
             return;
         }
 
-        importer.assetBundleName = importer.assetPath;
+        importer.assetBundleName = assetPath + AssetBundleConfig.AssetBundleSuffix;
     }
     public AssetBundleManifest BuildAllAssetRes()
     {
-        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+        if (!Directory.Exists(TargetDir)) Directory.CreateDirectory(TargetDir);
         BuildAssetBundleOptions buildOption = BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
-        return BuildPipeline.BuildAssetBundles(targetDir, buildOption, targetPlatform);
+        return BuildPipeline.BuildAssetBundles(TargetDir, buildOption, targetPlatform);
     }
     void BuildPathMapping(AssetBundleManifest manifest)
     {
@@ -137,7 +149,8 @@ public class PackageConfig : ScriptableObject
             }
         }
         mappingList.Sort();//让每次生成文件内容相同
-        string outputFilePath = AssetBundleConfig.PackagePathToAssetsPath(AssetBundleConfig.AssetsPathMapFileName);
+
+        string outputFilePath = AssetBundleConfig.GetAssetPath(AssetBundleConfig.AssetsPathMapFileName);
 
         if (!GameUtility.SafeWriteAllLines(outputFilePath, mappingList.ToArray()))
         {
@@ -146,7 +159,7 @@ public class PackageConfig : ScriptableObject
         else
         {
             AssetDatabase.Refresh();
-            CreateAssetbundleForCurrent(outputFilePath);
+            CreateAssetbundleForCurrent(AssetBundleConfig.AssetsPathMapFileName);
             Debug.Log("BuildPathMapping success...");
         }
         AssetDatabase.Refresh();
@@ -156,12 +169,11 @@ public class PackageConfig : ScriptableObject
     public static void BuildAllResources()
     {
         Log.Info("Start BuildAll");
-        Log.Info($"Clear {Instance.targetDir}");
-        GameUtility.SafeClearDir(Instance.targetDir);
-        Log.Info("start set ab name");
+        Log.Info($"Clear {Instance.TargetDir}");
+        GameUtility.SafeClearDir(Instance.TargetDir);
+        //Log.Info("start set ab name");
         foreach (var item in Instance.packageItems)
         {
-            string path = "Assets/" + item.path;
             if (item.type == PackageItem.PackType.File)
             {
                 Instance.PackFile(item.path);
@@ -172,7 +184,7 @@ public class PackageConfig : ScriptableObject
             }
             else if (item.type == PackageItem.PackType.Dir)
             {
-                Instance.PackDir(path, item.searchPattern, item.searchOption);
+                Instance.PackDir(item.path, item.searchPattern, item.searchOption);
             }
         }
         Log.Info("set ab name success,start first build");
@@ -182,8 +194,19 @@ public class PackageConfig : ScriptableObject
         Log.Info("start build all");
         Instance.BuildAllAssetRes();
         Log.Info("build success!!");
-        GameUtility.CopyFolder(Instance.targetDir, Application.streamingAssetsPath,"*" + AssetBundleConfig.AssetBundleSuffix);
+        GameUtility.CopyFolder(Instance.TargetDir, AssetBundleConfig.AssetsRootPath, AssetBundleConfig.AssetBundlePattern);
+        File.Copy(Path.Combine(Instance.TargetDir, "StreamingAssets"), Path.Combine(AssetBundleConfig.AssetsRootPath, "streamingassets" + AssetBundleConfig.AssetBundleSuffix), true);//覆盖模式
     }
 
+    [MenuItem("Tools/SetEditorMode")]
+    public static void SwitchEditorMode()
+    {
+        AssetBundleConfig.IsEditorMode = true;
+    }
+    [MenuItem("Tools/SetNoEditorMode")]
 
+    public static void SwitchNoEditorMode()
+    {
+        AssetBundleConfig.IsEditorMode = false;
+    }
 }

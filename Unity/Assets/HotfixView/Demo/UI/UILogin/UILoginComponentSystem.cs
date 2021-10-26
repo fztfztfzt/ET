@@ -16,9 +16,9 @@ namespace ET
 			self.account = rc.Get<GameObject>("Account");
 			self.password = rc.Get<GameObject>("Password");
 			self.icon = rc.Get<GameObject>("Icon").GetComponent<Image>();
-			//var sprites = Resources.LoadAll<Sprite>("cards/cards");
-			var sprite = ResourceManager.LoadAssetAtPath<Sprite>("Res/images/1024/bg_attack_purple.png");
-			self.icon.sprite = sprite;
+            //var sprites = Resources.LoadAll<Sprite>("cards/cards");
+            var sprite = ResourceManager.Instance.LoadAssetAtPath<Sprite>("Res/images/1024Portraits/blue/attack/all_for_one.png");
+            self.icon.sprite = sprite;
         }
 	}
 	
