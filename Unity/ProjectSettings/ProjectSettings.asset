@@ -737,7 +737,9 @@ PlayerSettings:
     4: NET452;ILRuntime
     7: NET452;ILRuntime;ODIN_INSPECTOR;ODIN_INSPECTOR_3
     13: NET452;ILRuntime
-  additionalCompilerArguments: {}
+  additionalCompilerArguments:
+    1:
+    - -nowarn:0414
   platformArchitecture:
     iPhone: 1
   scriptingBackend:

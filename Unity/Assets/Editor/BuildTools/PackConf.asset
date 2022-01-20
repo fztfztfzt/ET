@@ -26,3 +26,4 @@ MonoBehaviour:
     searchPattern: '*.prefab'
     searchOption: 1
   targetPlatform: 19
+  buildType: 0

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Sirenix.OdinInspector.Editor;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,8 @@ namespace ET
 
 	public class BuildEditor : EditorWindow
 	{
-        private const string settingAsset = "Assets/Editor/BuildEditor/ETBuildSettings.asset";
+		private const string settingAsset = "Assets/Editor/BuildEditor/ETBuildSettings.asset";
+		private const string settingAsset2 = "Assets/Editor/BuildTools/PackConf.asset";
 
         private readonly Dictionary<string, BundleInfo> dictionary = new Dictionary<string, BundleInfo>();
 
@@ -45,16 +47,18 @@ namespace ET
 		private BuildAssetBundleOptions buildAssetBundleOptions = BuildAssetBundleOptions.None;
 
 		private ETBuildSettings buildSettings;
-
+		private Editor editor;
 		[MenuItem("Tools/打包工具")]
 		public static void ShowWindow()
 		{
-			EditorWindow window = GetWindow<BuildEditor>(true, "打包工具");
-			window.minSize = new Vector2(420, 220);
-			window.maxSize = new Vector2(700, 400);
+			BuildEditor window = GetWindow<BuildEditor>(true, "打包工具");
+			//window.minSize = new Vector2(420, 220);
+			//window.maxSize = new Vector2(700, 400);
+			// 直接根据ScriptableObject构造一个Editor
+			window.editor = Editor.CreateEditor(AssetDatabase.LoadAssetAtPath<PackageConfig>(settingAsset2));
 		}
 
-        private void OnEnable()
+		protected void OnEnable()
         {
 #if UNITY_ANDROID
 			activePlatform = PlatformType.Android;
@@ -69,21 +73,21 @@ namespace ET
 #endif
             platformType = activePlatform;
 
-			if (!File.Exists(settingAsset))
-            {
-				buildSettings = new ETBuildSettings();
-				AssetDatabase.CreateAsset(buildSettings, settingAsset);
-            }
-			else
-			{
-				buildSettings = AssetDatabase.LoadAssetAtPath<ETBuildSettings>(settingAsset);
+			//if (!File.Exists(settingAsset))
+   //         {
+			//	buildSettings = new ETBuildSettings();
+			//	AssetDatabase.CreateAsset(buildSettings, settingAsset);
+   //         }
+			//else
+			//{
+			//	buildSettings = AssetDatabase.LoadAssetAtPath<ETBuildSettings>(settingAsset);
 
-				clearFolder = buildSettings.clearFolder;
-				isBuildExe = buildSettings.isBuildExe;
-				isContainAB = buildSettings.isContainAB;
-				buildType = buildSettings.buildType;
-				buildAssetBundleOptions = buildSettings.buildAssetBundleOptions;
-			}
+			//	clearFolder = buildSettings.clearFolder;
+			//	isBuildExe = buildSettings.isBuildExe;
+			//	isContainAB = buildSettings.isContainAB;
+			//	buildType = buildSettings.buildType;
+			//	buildAssetBundleOptions = buildSettings.buildAssetBundleOptions;
+			//}
         }
 
         private void OnDisable()
@@ -93,64 +97,65 @@ namespace ET
 
         private void OnGUI() 
 		{
-			EditorGUILayout.LabelField("打包平台:");
-			this.platformType = (PlatformType)EditorGUILayout.EnumPopup(platformType);
-			this.clearFolder = EditorGUILayout.Toggle("清理资源文件夹: ", clearFolder);
-			this.isBuildExe = EditorGUILayout.Toggle("是否打包EXE: ", this.isBuildExe);
-			this.isContainAB = EditorGUILayout.Toggle("是否同将资源打进EXE: ", this.isContainAB);
-			this.buildType = (BuildType)EditorGUILayout.EnumPopup("BuildType: ", this.buildType);
-			EditorGUILayout.LabelField("BuildAssetBundleOptions(可多选):");
-			this.buildAssetBundleOptions = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField(this.buildAssetBundleOptions);
-			
-			switch (buildType)
-			{
-				case BuildType.Development:
-					this.buildOptions = BuildOptions.Development | BuildOptions.AutoRunPlayer | BuildOptions.ConnectWithProfiler | BuildOptions.AllowDebugging;
-					break;
-				case BuildType.Release:
-					this.buildOptions = BuildOptions.None;
-					break;
-			}
+            editor.OnInspectorGUI();
+            //EditorGUILayout.LabelField("打包平台:");
+            //this.platformType = (PlatformType)EditorGUILayout.EnumPopup(platformType);
+            //this.clearFolder = EditorGUILayout.Toggle("清理资源文件夹: ", clearFolder);
+            //this.isBuildExe = EditorGUILayout.Toggle("是否打包EXE: ", this.isBuildExe);
+            //this.isContainAB = EditorGUILayout.Toggle("是否同将资源打进EXE: ", this.isContainAB);
+            //this.buildType = (BuildType)EditorGUILayout.EnumPopup("BuildType: ", this.buildType);
+            //EditorGUILayout.LabelField("BuildAssetBundleOptions(可多选):");
+            //this.buildAssetBundleOptions = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField(this.buildAssetBundleOptions);
 
-			GUILayout.Space(5);
+            //switch (buildType)
+            //{
+            //    case BuildType.Development:
+            //        this.buildOptions = BuildOptions.Development | BuildOptions.AutoRunPlayer | BuildOptions.ConnectWithProfiler | BuildOptions.AllowDebugging;
+            //        break;
+            //    case BuildType.Release:
+            //        this.buildOptions = BuildOptions.None;
+            //        break;
+            //}
 
-			if (GUILayout.Button("开始打包", GUILayout.ExpandHeight(true)))
-			{
-				if (this.platformType == PlatformType.None)
-				{
-					ShowNotification(new GUIContent("请选择打包平台!"));
-					return;
-				}
-				if (platformType != activePlatform)
-                {
-                    switch (EditorUtility.DisplayDialogComplex("警告!", $"当前目标平台为{activePlatform}, 如果切换到{platformType}, 可能需要较长加载时间", "切换", "取消", "不切换"))
-                    {
-						case 0:
-							activePlatform = platformType;
-							break;
-						case 1:
-							return;
-                        case 2:
-							platformType = activePlatform;
-							break;
-                    }
-                }
-				BuildHelper.Build(this.platformType, this.buildAssetBundleOptions, this.buildOptions, this.isBuildExe, this.isContainAB, this.clearFolder);
-			}
+            //GUILayout.Space(5);
 
-			GUILayout.Space(5);
-		}
+            //if (GUILayout.Button("开始打包", GUILayout.ExpandHeight(true)))
+            //{
+            //    if (this.platformType == PlatformType.None)
+            //    {
+            //        ShowNotification(new GUIContent("请选择打包平台!"));
+            //        return;
+            //    }
+            //    if (platformType != activePlatform)
+            //    {
+            //        switch (EditorUtility.DisplayDialogComplex("警告!", $"当前目标平台为{activePlatform}, 如果切换到{platformType}, 可能需要较长加载时间", "切换", "取消", "不切换"))
+            //        {
+            //            case 0:
+            //                activePlatform = platformType;
+            //                break;
+            //            case 1:
+            //                return;
+            //            case 2:
+            //                platformType = activePlatform;
+            //                break;
+            //        }
+            //    }
+            //BuildHelper.Build(this.platformType, this.buildAssetBundleOptions, this.buildOptions, this.isBuildExe, this.isContainAB, this.clearFolder);
+            //}
+
+            //GUILayout.Space(5);
+        }
 
 		private void SaveSettings()
         {
-			buildSettings.clearFolder = clearFolder;
-			buildSettings.isBuildExe = isBuildExe;
-			buildSettings.isContainAB = isContainAB;
-			buildSettings.buildType = buildType;
-			buildSettings.buildAssetBundleOptions = buildAssetBundleOptions;
+			//buildSettings.clearFolder = clearFolder;
+			//buildSettings.isBuildExe = isBuildExe;
+			//buildSettings.isContainAB = isContainAB;
+			//buildSettings.buildType = buildType;
+			//buildSettings.buildAssetBundleOptions = buildAssetBundleOptions;
 
-			EditorUtility.SetDirty(buildSettings);
-			AssetDatabase.SaveAssets();
+			//EditorUtility.SetDirty(buildSettings);
+			//AssetDatabase.SaveAssets();
         }
 	}
 }

@@ -19,6 +19,12 @@ public class PackageItem
     public SearchOption searchOption;
 }
 
+public enum BuildType
+{
+    Development,
+    Release,
+}
+
 [CreateAssetMenu(fileName = "packageConfig", menuName = "packageConfig", order = 1)]
 public class PackageConfig : ScriptableObject
 {
@@ -28,11 +34,11 @@ public class PackageConfig : ScriptableObject
     {
         get
         {
-            _instance = AssetDatabase.LoadAssetAtPath<PackageConfig>("Assets/Editor/Tools/PackConf.asset");
+            _instance = AssetDatabase.LoadAssetAtPath<PackageConfig>("Assets/Editor/BuildTools/PackConf.asset");
             if (_instance == null)
             {
                 _instance = ScriptableObject.CreateInstance<PackageConfig>();
-                AssetDatabase.CreateAsset(_instance, "Assets/Tools/Editor/PackConf.asset");
+                AssetDatabase.CreateAsset(_instance, "Assets/Editor/BuildTools/PackConf.asset");
             }
 
             return _instance;
@@ -41,10 +47,14 @@ public class PackageConfig : ScriptableObject
     #endregion
 
     #region 可配置属性定义
-    [SerializeField]
+    [SerializeField, LabelText("AB配置")]
     List<PackageItem> packageItems;
+    [SerializeField, LabelText("打包平台")]
+    BuildTarget targetPlatform = BuildTarget.StandaloneWindows64;
     [SerializeField]
-    BuildTarget targetPlatform;
+    BuildType buildType = BuildType.Development;
+
+    BuildAssetBundleOptions buildOption = BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
     #endregion
 
 
@@ -55,7 +65,7 @@ public class PackageConfig : ScriptableObject
     {
         get
         {
-            if(string.IsNullOrEmpty(_targetDir))
+            if (string.IsNullOrEmpty(_targetDir))
             {
                 _targetDir = $"../Release/{targetPlatform}/StreamingAssets";
             }
@@ -132,17 +142,16 @@ public class PackageConfig : ScriptableObject
     public AssetBundleManifest BuildAllAssetRes()
     {
         if (!Directory.Exists(TargetDir)) Directory.CreateDirectory(TargetDir);
-        BuildAssetBundleOptions buildOption = BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
         return BuildPipeline.BuildAssetBundles(TargetDir, buildOption, targetPlatform);
     }
     void BuildPathMapping(AssetBundleManifest manifest)
     {
         List<string> mappingList = new List<string>();
         string[] allAssetbundles = manifest.GetAllAssetBundles();
-        foreach(var assetbundle in allAssetbundles)
+        foreach (var assetbundle in allAssetbundles)
         {
             var assetPaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetbundle);
-            foreach(var assetPath in assetPaths)
+            foreach (var assetPath in assetPaths)
             {
                 string mappingItem = string.Format("{0}{1}{2}", assetbundle, AssetBundleConfig.PATTREN, assetPath);
                 mappingList.Add(mappingItem);
@@ -165,7 +174,7 @@ public class PackageConfig : ScriptableObject
         AssetDatabase.Refresh();
     }
 
-    [MenuItem("Tools/BuildAll")]
+    [Button("全量构建AB", ButtonSizes.Large)]
     public static void BuildAllResources()
     {
         Log.Info("Start BuildAll");
@@ -198,13 +207,19 @@ public class PackageConfig : ScriptableObject
         File.Copy(Path.Combine(Instance.TargetDir, "StreamingAssets"), Path.Combine(AssetBundleConfig.AssetsRootPath, "streamingassets" + AssetBundleConfig.AssetBundleSuffix), true);//覆盖模式
     }
 
+    [Button("增量构建AB", ButtonSizes.Large)]
+    public static void BuildIncrement()
+    {
+
+    }
+
+    
     [MenuItem("Tools/SetEditorMode")]
     public static void SwitchEditorMode()
     {
         AssetBundleConfig.IsEditorMode = true;
     }
     [MenuItem("Tools/SetNoEditorMode")]
-
     public static void SwitchNoEditorMode()
     {
         AssetBundleConfig.IsEditorMode = false;
