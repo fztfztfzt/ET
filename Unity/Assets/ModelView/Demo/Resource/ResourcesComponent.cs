@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using AssetBundles;
 #if UNITY_EDITOR
 using UnityEditor;
 
@@ -76,7 +77,16 @@ namespace ET
             request.completed += operation => { tcs.SetResult(request.allAssets); };
             return await tcs;
         }
-
+        public static async ETTask<T> UnityLoadOneAssetAsync<T>(AssetBundle assetBundle,string assetName) where T : UnityEngine.Object
+        {
+            var tcs = ETTask<T>.Create(true);
+            AssetBundleRequest request = assetBundle.LoadAssetAsync<T>(assetName);
+            request.completed += operation => 
+            { 
+                tcs.SetResult(request.asset as T); 
+            };
+            return await tcs;
+        }
         public static string IntToString(this int value)
         {
             string result;
@@ -148,17 +158,34 @@ namespace ET
 
         private readonly Dictionary<string, ABInfo> bundles = new Dictionary<string, ABInfo>();
 
+        private AssetsPathMapping assetsPathMapping = new AssetsPathMapping();
+
+
         public void Awake()
         {
             Instance = this;
 
-            if (Define.IsAsync)
+            //if (Define.IsAsync)
             {
-                LoadOneBundle("StreamingAssets");
-                AssetBundleManifestObject = (AssetBundleManifest) GetAsset("StreamingAssets", "AssetBundleManifest");
+                InitManifest();
+                InitPathMappine();
             }
         }
 
+        // 初始化Manifest，用来获取ab包的依赖关系
+        void InitManifest()
+        {
+            var ManifestBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundleMainfestPath());
+            AssetBundleManifestObject = ManifestBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            ManifestBundle.Unload(false);
+        }
+
+        void InitPathMappine()
+        {
+            var assetBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundlePath(assetsPathMapping.AssetbundleName));
+            var mapContent = assetBundle.LoadAsset<TextAsset>(assetsPathMapping.AssetName);
+            assetsPathMapping.Initialize(mapContent.text);
+        }
         public override void Dispose()
         {
             if (this.IsDisposed)
@@ -180,6 +207,8 @@ namespace ET
             this.IntToStringDict.Clear();
             this.StringToABDict.Clear();
             this.BundleNameToLowerDict.Clear();
+            this.assetsCaching.Clear();
+
         }
 
         private string[] GetDependencies(string assetBundleName)
@@ -373,6 +402,7 @@ namespace ET
             }
 
             dict[assetName] = resource;
+            assetsCaching[assetName] = resource;
         }
 
         private void LoadOneBundle(string assetBundleName)
@@ -594,6 +624,41 @@ namespace ET
             }
         }
 
+
+        // asset缓存：给非公共ab包的asset提供逻辑层的复用
+        Dictionary<string, UnityEngine.Object> assetsCaching = new Dictionary<string, UnityEngine.Object>();
+        public bool IsAssetLoaded(string assetName)
+        {
+            return assetsCaching.ContainsKey(assetName);
+        }
+        public UnityEngine.Object GetAssetCache(string assetName)
+        {
+            assetsCaching.TryGetValue(assetName, out var target);
+            return target;
+        }
+        public async ETTask<T> LoadAssetAtPathAsync<T>(string path) where T : UnityEngine.Object
+        {
+            if (IsAssetLoaded(path))
+            {
+                return GetAssetCache(path) as T;
+            }
+#if UNITY_EDITOR
+            if (AssetBundleConfig.IsEditorMode)
+            {
+                //await TimerComponent.Instance.WaitAsync(100);
+                //return AssetDatabase.LoadAssetAtPath<T>("Assets/" + path);
+            }
+#endif
+            string assetBundleName = assetsPathMapping.GetAssetBundleName(path);
+            ABInfo abInfo;
+            if (!this.bundles.TryGetValue(assetBundleName, out abInfo))
+            {
+                abInfo = await LoadOneBundleAsync(assetBundleName);
+            }
+            var asset = await AssetBundleHelper.UnityLoadOneAssetAsync<T>(abInfo.AssetBundle, path);
+            AddResource(assetBundleName, path, asset);
+            return asset;
+        }
         public string DebugString()
         {
             StringBuilder sb = new StringBuilder();
