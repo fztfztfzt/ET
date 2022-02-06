@@ -4,10 +4,12 @@ using UnityEngine;
 
 namespace ET
 {
-    [BsonIgnoreExtraElements]
-    public sealed class Unit: Entity
+    public sealed class Unit: Entity, IAwake<int>
     {
         public int ConfigId; //配置表id
+
+        [BsonIgnore]
+        public UnitType Type => (UnitType)this.Config.Type;
 
         [BsonIgnore]
         public UnitConfig Config => UnitConfigCategory.Instance.Get(this.ConfigId);
@@ -20,7 +22,7 @@ namespace ET
             set
             {
                 this.position = value;
-                Game.EventSystem.Publish(new EventType.ChangePosition() { Unit = this }).Coroutine();
+                Game.EventSystem.Publish(new EventType.ChangePosition() { Unit = this });
             }
         }
 
@@ -38,7 +40,7 @@ namespace ET
             set
             {
                 this.rotation = value;
-                Game.EventSystem.Publish(new EventType.ChangeRotation() {Unit = this}).Coroutine();
+                Game.EventSystem.Publish(new EventType.ChangeRotation() {Unit = this});
             }
         }
     }

@@ -3,53 +3,29 @@ using ProtoBuf;
 using System.Collections.Generic;
 namespace ET
 {
-/// <summary>
-/// 传送unit
-/// </summary>
-	[ResponseType(typeof(M2M_TrasferUnitResponse))]
-	[Message(InnerOpcode.M2M_TrasferUnitRequest)]
+	[ResponseType(nameof(ObjectQueryResponse))]
+	[Message(InnerOpcode.ObjectQueryRequest)]
 	[ProtoContract]
-	public partial class M2M_TrasferUnitRequest: Object, IActorRequest
+	public partial class ObjectQueryRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
 
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
-
 		[ProtoMember(1)]
-		public Unit Unit { get; set; }
+		public long Key { get; set; }
 
-	}
-
-	[Message(InnerOpcode.M2M_TrasferUnitResponse)]
-	[ProtoContract]
-	public partial class M2M_TrasferUnitResponse: Object, IActorResponse
-	{
-		[ProtoMember(90)]
-		public int RpcId { get; set; }
-
-		[ProtoMember(91)]
-		public int Error { get; set; }
-
-		[ProtoMember(92)]
-		public string Message { get; set; }
-
-		[ProtoMember(1)]
+		[ProtoMember(2)]
 		public long InstanceId { get; set; }
 
 	}
 
-	[ResponseType(typeof(A2M_Reload))]
+	[ResponseType(nameof(A2M_Reload))]
 	[Message(InnerOpcode.M2A_Reload)]
 	[ProtoContract]
 	public partial class M2A_Reload: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 	}
 
@@ -68,16 +44,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(G2G_LockResponse))]
+	[ResponseType(nameof(G2G_LockResponse))]
 	[Message(InnerOpcode.G2G_LockRequest)]
 	[ProtoContract]
 	public partial class G2G_LockRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Id { get; set; }
@@ -102,16 +75,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(G2G_LockReleaseResponse))]
+	[ResponseType(nameof(G2G_LockReleaseResponse))]
 	[Message(InnerOpcode.G2G_LockReleaseRequest)]
 	[ProtoContract]
 	public partial class G2G_LockReleaseRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Id { get; set; }
@@ -136,16 +106,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(ObjectAddResponse))]
+	[ResponseType(nameof(ObjectAddResponse))]
 	[Message(InnerOpcode.ObjectAddRequest)]
 	[ProtoContract]
 	public partial class ObjectAddRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Key { get; set; }
@@ -170,16 +137,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(ObjectLockResponse))]
+	[ResponseType(nameof(ObjectLockResponse))]
 	[Message(InnerOpcode.ObjectLockRequest)]
 	[ProtoContract]
 	public partial class ObjectLockRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Key { get; set; }
@@ -207,16 +171,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(ObjectUnLockResponse))]
+	[ResponseType(nameof(ObjectUnLockResponse))]
 	[Message(InnerOpcode.ObjectUnLockRequest)]
 	[ProtoContract]
 	public partial class ObjectUnLockRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Key { get; set; }
@@ -244,16 +205,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(ObjectRemoveResponse))]
+	[ResponseType(nameof(ObjectRemoveResponse))]
 	[Message(InnerOpcode.ObjectRemoveRequest)]
 	[ProtoContract]
 	public partial class ObjectRemoveRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Key { get; set; }
@@ -275,16 +233,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(ObjectGetResponse))]
+	[ResponseType(nameof(ObjectGetResponse))]
 	[Message(InnerOpcode.ObjectGetRequest)]
 	[ProtoContract]
 	public partial class ObjectGetRequest: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public long Key { get; set; }
@@ -309,16 +264,13 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(G2R_GetLoginKey))]
+	[ResponseType(nameof(G2R_GetLoginKey))]
 	[Message(InnerOpcode.R2G_GetLoginKey)]
 	[ProtoContract]
 	public partial class R2G_GetLoginKey: Object, IActorRequest
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
 
 		[ProtoMember(1)]
 		public string Account { get; set; }
@@ -346,47 +298,21 @@ namespace ET
 
 	}
 
-	[ResponseType(typeof(M2G_CreateUnit))]
-	[Message(InnerOpcode.G2M_CreateUnit)]
+	[Message(InnerOpcode.M2M_UnitTransferResponse)]
 	[ProtoContract]
-	public partial class G2M_CreateUnit: Object, IActorRequest
+	public partial class M2M_UnitTransferResponse: Object, IActorResponse
 	{
-		[ProtoMember(90)]
-		public int RpcId { get; set; }
-
-		[ProtoMember(93)]
-		public long ActorId { get; set; }
-
 		[ProtoMember(1)]
-		public long PlayerId { get; set; }
+		public int RpcId { get; set; }
 
 		[ProtoMember(2)]
-		public long GateSessionId { get; set; }
-
-	}
-
-	[Message(InnerOpcode.M2G_CreateUnit)]
-	[ProtoContract]
-	public partial class M2G_CreateUnit: Object, IActorResponse
-	{
-		[ProtoMember(90)]
-		public int RpcId { get; set; }
-
-		[ProtoMember(91)]
 		public int Error { get; set; }
 
-		[ProtoMember(92)]
+		[ProtoMember(3)]
 		public string Message { get; set; }
 
-// 自己的unit id
-// 自己的unit id
-		[ProtoMember(1)]
-		public long UnitId { get; set; }
-
-// 所有的unit
-// 所有的unit
-		[ProtoMember(2)]
-		public List<UnitInfo> Units = new List<UnitInfo>();
+		[ProtoMember(4)]
+		public long NewInstanceId { get; set; }
 
 	}
 
@@ -396,9 +322,6 @@ namespace ET
 	{
 		[ProtoMember(90)]
 		public int RpcId { get; set; }
-
-		[ProtoMember(94)]
-		public long ActorId { get; set; }
 
 	}
 

@@ -1,5 +1,6 @@
 ﻿namespace ET
 {
+	[ObjectSystem]
 	public class PlayerSystem : AwakeSystem<Player, string>
 	{
 		public override void Awake(Player self, string a)
@@ -8,7 +9,7 @@
 		}
 	}
 
-	public sealed class Player : Entity
+	public sealed class Player : Entity, IAwake<string>
 	{
 		public string Account { get; private set; }
 		
