@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using AssetBundles;
+//using AssetBundles;
 #if UNITY_EDITOR
 using UnityEditor;
 
@@ -38,7 +38,7 @@ namespace ET
         }
     }
 
-    public class ABInfo: Entity
+    public class ABInfo: Entity, IAwake<string, AssetBundle>, IDestroy
     {
         public string Name { get; set; }
 
@@ -141,7 +141,7 @@ namespace ET
         }
     }
 
-    public class ResourcesComponent: Entity
+    public class ResourcesComponent: Entity, IAwake
     {
         public static ResourcesComponent Instance { get; set; }
 
@@ -158,7 +158,7 @@ namespace ET
 
         private readonly Dictionary<string, ABInfo> bundles = new Dictionary<string, ABInfo>();
 
-        private AssetsPathMapping assetsPathMapping = new AssetsPathMapping();
+        //private AssetsPathMapping assetsPathMapping = new AssetsPathMapping();
 
 
         public void Awake()
@@ -166,26 +166,26 @@ namespace ET
             Instance = this;
 
             //if (Define.IsAsync)
-            {
-                InitManifest();
-                InitPathMappine();
-            }
+            //{
+            //    InitManifest();
+            //    InitPathMappine();
+            //}
         }
 
         // 初始化Manifest，用来获取ab包的依赖关系
-        void InitManifest()
-        {
-            var ManifestBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundleMainfestPath());
-            AssetBundleManifestObject = ManifestBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            ManifestBundle.Unload(false);
-        }
+        //void InitManifest()
+        //{
+        //    var ManifestBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundleMainfestPath());
+        //    AssetBundleManifestObject = ManifestBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        //    ManifestBundle.Unload(false);
+        //}
 
-        void InitPathMappine()
-        {
-            var assetBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundlePath(assetsPathMapping.AssetbundleName));
-            var mapContent = assetBundle.LoadAsset<TextAsset>(assetsPathMapping.AssetName);
-            assetsPathMapping.Initialize(mapContent.text);
-        }
+        //void InitPathMappine()
+        //{
+        //    var assetBundle = AssetBundle.LoadFromFile(AssetBundleConfig.GetAssetBundlePath(assetsPathMapping.AssetbundleName));
+        //    var mapContent = assetBundle.LoadAsset<TextAsset>(assetsPathMapping.AssetName);
+        //    assetsPathMapping.Initialize(mapContent.text);
+        //}
         public override void Dispose()
         {
             if (this.IsDisposed)
@@ -316,11 +316,16 @@ namespace ET
             //Log.Debug($"-----------dep unload start {assetBundleName} dep: {dependencies.ToList().ListToString()}");
             foreach (string dependency in dependencies)
             {
-                using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, assetBundleName.GetHashCode()))
+                CoroutineLock coroutineLock = null;
+                try
                 {
+                    coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, assetBundleName.GetHashCode());
                     this.UnloadOneBundle(dependency, unload);
-                    
                     await TimerComponent.Instance.WaitFrameAsync();
+                }
+                finally
+                {
+                    coroutineLock?.Dispose();
                 }
             }
             //Log.Debug($"-----------dep unload finish {assetBundleName} dep: {dependencies.ToList().ListToString()}");
@@ -472,7 +477,7 @@ namespace ET
                 }
             }
 
-            abInfo = Entity.Create<ABInfo, string, AssetBundle>(this, assetBundleName, assetBundle);
+            abInfo = this.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
             this.bundles[assetBundleName] = abInfo;
 
             //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
@@ -492,8 +497,10 @@ namespace ET
             {
                 async ETTask LoadDependency(string dependency, List<ABInfo> abInfosList)
                 {
-                    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, dependency.GetHashCode()))
+                    CoroutineLock coroutineLock = null;
+                    try
                     {
+                        coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, dependency.GetHashCode());
                         ABInfo abInfo = await this.LoadOneBundleAsync(dependency);
                         if (abInfo == null || abInfo.RefCount > 1)
                         {
@@ -502,6 +509,10 @@ namespace ET
 
                         abInfosList.Add(abInfo);
                     }
+                    finally
+                    {
+                        coroutineLock?.Dispose();
+                    }
                 }
 
                 // LoadFromFileAsync部分可以并发加载
@@ -509,21 +520,21 @@ namespace ET
                 {
                     foreach (string dependency in dependencies)
                     {
-                        tasks.List.Add(LoadDependency(dependency, abInfos.List));
+                        tasks.Add(LoadDependency(dependency, abInfos));
                     }
 
-                    await ETTaskHelper.WaitAll(tasks.List);
+                    await ETTaskHelper.WaitAll(tasks);
                 }
 
                 // ab包从硬盘加载完成，可以再并发加载all assets
                 using (var tasks = ListComponent<ETTask>.Create())
                 {
-                    foreach (ABInfo abInfo in abInfos.List)
+                    foreach (ABInfo abInfo in abInfos)
                     {
-                        tasks.List.Add(LoadOneBundleAllAssets(abInfo));
+                        tasks.Add(LoadOneBundleAllAssets(abInfo));
                     }
 
-                    await ETTaskHelper.WaitAll(tasks.List);
+                    await ETTaskHelper.WaitAll(tasks);
                 }
             }
         }
@@ -593,7 +604,7 @@ namespace ET
                 return null;
             }
 
-            abInfo = Entity.Create<ABInfo, string, AssetBundle>(this, assetBundleName, assetBundle);
+            abInfo = this.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
             this.bundles[assetBundleName] = abInfo;
             return abInfo;
             //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
@@ -602,8 +613,11 @@ namespace ET
         // 加载ab包中的all assets
         private async ETTask LoadOneBundleAllAssets(ABInfo abInfo)
         {
-            using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, abInfo.Name.GetHashCode()))
+            CoroutineLock coroutineLock = null;
+            try
             {
+                coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, abInfo.Name.GetHashCode());
+
                 if (abInfo.IsDisposed || abInfo.AlreadyLoadAssets)
                 {
                     return;
@@ -621,6 +635,10 @@ namespace ET
                 }
 
                 abInfo.AlreadyLoadAssets = true;
+            }
+            finally
+            {
+                coroutineLock?.Dispose();
             }
         }
 
@@ -649,7 +667,7 @@ namespace ET
                 //return AssetDatabase.LoadAssetAtPath<T>("Assets/" + path);
             }
 #endif
-            string assetBundleName = assetsPathMapping.GetAssetBundleName(path);
+            string assetBundleName = path;// assetsPathMapping.GetAssetBundleName(path);
             ABInfo abInfo;
             if (!this.bundles.TryGetValue(assetBundleName, out abInfo))
             {

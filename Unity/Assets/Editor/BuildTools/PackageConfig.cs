@@ -5,7 +5,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using Sirenix.OdinInspector;
-using AssetBundles;
+//using AssetBundles;
 using ET;
 
 [System.Serializable]
@@ -51,15 +51,15 @@ public class PackageConfig : ScriptableObject
     List<PackageItem> packageItems;
     [SerializeField, LabelText("打包平台")]
     BuildTarget targetPlatform = BuildTarget.StandaloneWindows64;
-    [SerializeField]
-    BuildType buildType = BuildType.Development;
+    //[SerializeField]
+    //BuildType buildType = BuildType.Development;
 
     BuildAssetBundleOptions buildOption = BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
     #endregion
 
 
-    string abExtens = AssetBundleConfig.AssetBundleSuffix;
-    string abDirExtens = AssetBundleConfig.AssetBundleSuffix;
+    string abExtens = ""; //AssetBundleConfig.AssetBundleSuffix;
+    string abDirExtens = "";// AssetBundleConfig.AssetBundleSuffix;
     string _targetDir;
     public string TargetDir
     {
@@ -129,7 +129,7 @@ public class PackageConfig : ScriptableObject
     }
     public static void CreateAssetbundleForCurrent(string assetPath)
     {
-        string outputFilePath = AssetBundleConfig.GetAssetPath(assetPath);
+        string outputFilePath = "";// AssetBundleConfig.GetAssetPath(assetPath);
         AssetImporter importer = AssetImporter.GetAtPath(outputFilePath);
         if (importer == null)
         {
@@ -137,7 +137,7 @@ public class PackageConfig : ScriptableObject
             return;
         }
 
-        importer.assetBundleName = assetPath + AssetBundleConfig.AssetBundleSuffix;
+        importer.assetBundleName = "";// assetPath + AssetBundleConfig.AssetBundleSuffix;
     }
     public AssetBundleManifest BuildAllAssetRes()
     {
@@ -153,24 +153,24 @@ public class PackageConfig : ScriptableObject
             var assetPaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetbundle);
             foreach (var assetPath in assetPaths)
             {
-                string mappingItem = string.Format("{0}{1}{2}", assetbundle, AssetBundleConfig.PATTREN, assetPath);
+                string mappingItem = string.Format("{0}{1}{2}", assetbundle, ""/*AssetBundleConfig.PATTREN*/, assetPath);
                 mappingList.Add(mappingItem);
             }
         }
         mappingList.Sort();//让每次生成文件内容相同
 
-        string outputFilePath = AssetBundleConfig.GetAssetPath(AssetBundleConfig.AssetsPathMapFileName);
+        //string outputFilePath = "";// AssetBundleConfig.GetAssetPath(AssetBundleConfig.AssetsPathMapFileName);
 
-        if (!GameUtility.SafeWriteAllLines(outputFilePath, mappingList.ToArray()))
-        {
-            Debug.LogError("BuildPathMapping failed!!! try rebuild it again!");
-        }
-        else
-        {
-            AssetDatabase.Refresh();
-            CreateAssetbundleForCurrent(AssetBundleConfig.AssetsPathMapFileName);
-            Debug.Log("BuildPathMapping success...");
-        }
+        //if (!GameUtility.SafeWriteAllLines(outputFilePath, mappingList.ToArray()))
+        //{
+        //    Debug.LogError("BuildPathMapping failed!!! try rebuild it again!");
+        //}
+        //else
+        //{
+        //    AssetDatabase.Refresh();
+        //    CreateAssetbundleForCurrent(AssetBundleConfig.AssetsPathMapFileName);
+        //    Debug.Log("BuildPathMapping success...");
+        //}
         AssetDatabase.Refresh();
     }
 
@@ -179,7 +179,7 @@ public class PackageConfig : ScriptableObject
     {
         Log.Info("Start BuildAll");
         Log.Info($"Clear {Instance.TargetDir}");
-        GameUtility.SafeClearDir(Instance.TargetDir);
+        //GameUtility.SafeClearDir(Instance.TargetDir);
         //Log.Info("start set ab name");
         foreach (var item in Instance.packageItems)
         {
@@ -203,8 +203,8 @@ public class PackageConfig : ScriptableObject
         Log.Info("start build all");
         Instance.BuildAllAssetRes();
         Log.Info("build success!!");
-        GameUtility.CopyFolder(Instance.TargetDir, AssetBundleConfig.AssetsRootPath, AssetBundleConfig.AssetBundlePattern);
-        File.Copy(Path.Combine(Instance.TargetDir, "StreamingAssets"), Path.Combine(AssetBundleConfig.AssetsRootPath, "streamingassets" + AssetBundleConfig.AssetBundleSuffix), true);//覆盖模式
+        //GameUtility.CopyFolder(Instance.TargetDir, AssetBundleConfig.AssetsRootPath, AssetBundleConfig.AssetBundlePattern);
+        //File.Copy(Path.Combine(Instance.TargetDir, "StreamingAssets"), Path.Combine(AssetBundleConfig.AssetsRootPath, "streamingassets" + AssetBundleConfig.AssetBundleSuffix), true);//覆盖模式
     }
 
     [Button("增量构建AB", ButtonSizes.Large)]
@@ -217,11 +217,11 @@ public class PackageConfig : ScriptableObject
     [MenuItem("Tools/SetEditorMode")]
     public static void SwitchEditorMode()
     {
-        AssetBundleConfig.IsEditorMode = true;
+        //AssetBundleConfig.IsEditorMode = true;
     }
     [MenuItem("Tools/SetNoEditorMode")]
     public static void SwitchNoEditorMode()
     {
-        AssetBundleConfig.IsEditorMode = false;
+        //AssetBundleConfig.IsEditorMode = false;
     }
 }

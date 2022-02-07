@@ -44,7 +44,7 @@ namespace ET
 		private bool isContainAB;
 		private BuildType buildType;
 		private BuildOptions buildOptions;
-		private BuildAssetBundleOptions buildAssetBundleOptions = BuildAssetBundleOptions.None;
+		//private BuildAssetBundleOptions buildAssetBundleOptions = BuildAssetBundleOptions.None;
 
 		private ETBuildSettings buildSettings;
 		private Editor editor;
